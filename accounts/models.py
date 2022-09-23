@@ -44,6 +44,7 @@ class Account(AbstractUser):
     username = models.CharField(max_length=150, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     department = models.ForeignKey('Department', null=True, on_delete=models.CASCADE)
+
     REQUIRED_FIELDS = ['first_name', 'last_name']
     USERNAME_FIELD = 'email'
     objects = AccountManager()
@@ -51,6 +52,18 @@ class Account(AbstractUser):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def category(self):
+        if self.orders.count() <= 20:
+            return 'Bronze'
+        elif self.orders.count() <= 49:
+            return 'Silver'
+        else:
+            return 'Gold'
+
+
+
 
 
 class Department(models.Model):

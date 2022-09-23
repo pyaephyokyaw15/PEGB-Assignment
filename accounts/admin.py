@@ -18,8 +18,15 @@ class AccountAdmin(UserAdmin):
         ('Departments', {
             'classes': ('wide',),
             'fields': ('department',)}
+        ),
+
+        ('Customer Category', {
+            'classes': ('wide',),
+            'fields': ('category',)}
          ),
     )
+
+    readonly_fields = ['category']
 
 
 class DepartmentAdmin(admin.ModelAdmin):
