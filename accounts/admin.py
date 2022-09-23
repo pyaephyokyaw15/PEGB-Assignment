@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Account
+from .models import Account, Department
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -14,6 +14,18 @@ class AccountAdmin(UserAdmin):
          ),
     )
 
+    fieldsets = UserAdmin.fieldsets + (
+        ('Departments', {
+            'classes': ('wide',),
+            'fields': ('department',)}
+         ),
+    )
+
+
+class DepartmentAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
+
 
 # Register models on admin site
 admin.site.register(Account, AccountAdmin)
+admin.site.register(Department, DepartmentAdmin)
