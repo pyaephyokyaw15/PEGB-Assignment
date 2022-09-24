@@ -5,6 +5,7 @@ from accounts.models import Account, CustomerCategory
 from drf_extra_fields.fields import Base64ImageField
 from products.models import Product, Category
 from accounts.models import Account, CustomerCategory
+from cart.models import Cart, CartItem
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
@@ -111,3 +112,20 @@ class ProductSerializer(serializers.ModelSerializer):
         print(validated_data)
         obj = super().create(validated_data)
         return obj
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    class Meta:
+        model = CartItem
+        fields = ['cart', 'product', 'quantity']
+
+class CartSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    cart_items = CartItemSerializer(many=True)
+    class Meta:
+        model = Cart
+        fields = ['id', 'user', 'cart_items', 'total_price']
+        read_only_fields = ['cart_items']  # show only on GET request
+
+

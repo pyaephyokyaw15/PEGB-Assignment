@@ -6,6 +6,8 @@ app_name = 'api'
 
 router = DefaultRouter()
 router.register('products', views.ProductViewSet)
+router.register('carts', views.CartViewSet)
+router.register('cart_items', views.CartItemViewSet)
 
 
 urlpatterns = [
@@ -13,5 +15,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/token/', views.TokenView.as_view(), name='token'),
     path('auth/register/', views.UserRegisterAPIView.as_view(), name='register'),
-    path('accounts/', views.AccountListView.as_view(), name='accounts')
+    path('accounts/', views.AccountListView.as_view(), name='accounts'),
 ]

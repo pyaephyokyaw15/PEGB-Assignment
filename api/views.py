@@ -1,11 +1,13 @@
 from rest_framework.authtoken.views import ObtainAuthToken
-from .serializers import CustomAuthTokenSerializer, UserRegisterSerializer, ProductSerializer, UserSerializer
+from .serializers import CustomAuthTokenSerializer, UserRegisterSerializer, ProductSerializer, \
+    UserSerializer, CartSerializer, CartItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics, permissions, viewsets
 from products.models import Product
 from accounts.models import Account
+from cart.models import Cart, CartItem
 from .permissions import DepartmentStaffOnly
 
 # Create your views here.
@@ -71,3 +73,20 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [DepartmentStaffOnly]
 
+
+class CartViewSet(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    queryset = Cart.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+        else:
+            cart = Cart.objects.create()
+
+        return Response({"cart_id": cart.id}, status=status.HTTP_201_CREATED)
+
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    serializer_class = CartItemSerializer
+    queryset = CartItem.objects.all()
