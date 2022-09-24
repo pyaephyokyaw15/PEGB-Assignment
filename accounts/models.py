@@ -5,6 +5,19 @@ from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
+class CustomerCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    discount_percentage = models.FloatField(default=0)
+    minimum_order = models.IntegerField()
+    maximum_order = models.IntegerField()
+
+
+    class Meta:
+        verbose_name_plural = 'customer categories'
+
+    def __str__(self):
+        return self.name
+
 class AccountManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -21,6 +34,12 @@ class AccountManager(BaseUserManager):
         user = self.model(email=email, first_name=first_name, last_name=last_name, password=password,  **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+        customer_category = CustomerCategory.objects.filter(name='Bronze').first()
+        print(user)
+        print("Category", customer_category)
+        user.customer_category = customer_category
+        user.save()
+        print(user)
         return user
 
     def create_superuser(self, email, first_name, last_name, password, **extra_fields):
@@ -43,33 +62,20 @@ class Account(AbstractUser):
 
     username = models.CharField(max_length=150, blank=True)
     email = models.EmailField(_('email address'), unique=True)
-    department = models.ForeignKey('Department', null=True, on_delete=models.CASCADE)
-
+    department = models.ForeignKey('Department', null=True, on_delete=models.CASCADE, blank=True)
+    customer_category = models.ForeignKey('CustomerCategory', null=True, on_delete=models.SET_NULL, blank=True)
     REQUIRED_FIELDS = ['first_name', 'last_name']
     USERNAME_FIELD = 'email'
     objects = AccountManager()
-
-    @property
-    def full_name(self):
-        return f'{self.first_name} {self.last_name}'
-
-    @property
-    def category(self):
-        if self.orders.count() <= 20:
-            return 'Bronze'
-        elif self.orders.count() <= 49:
-            return 'Silver'
-        else:
-            return 'Gold'
-
 
 
 
 
 class Department(models.Model):
     name = models.CharField(max_length=100, unique=True, db_index=True)
-    slug = models.SlugField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
+
 

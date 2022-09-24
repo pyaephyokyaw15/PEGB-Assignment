@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import Account, Department
+from .models import Account, Department, CustomerCategory
 from django.contrib.auth.admin import UserAdmin
 
 
-# Create your models here.
 class AccountAdmin(UserAdmin):
     list_display = ('email', 'first_name', 'last_name', 'is_active')
     list_display_links = ('email', 'first_name', 'last_name')
@@ -18,21 +17,17 @@ class AccountAdmin(UserAdmin):
         ('Departments', {
             'classes': ('wide',),
             'fields': ('department',)}
-        ),
-
+         ),
         ('Customer Category', {
             'classes': ('wide',),
-            'fields': ('category',)}
+            'fields': ('customer_category',)}
          ),
     )
 
-    readonly_fields = ['category']
-
-
-class DepartmentAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug': ('name',)}
+    # readonly_fields = ['customer_category']
 
 
 # Register models on admin site
 admin.site.register(Account, AccountAdmin)
-admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Department)
+admin.site.register(CustomerCategory)
