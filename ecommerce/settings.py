@@ -50,7 +50,8 @@ INSTALLED_APPS = [
 
     # Register your apps here
     'accounts.apps.AccountsConfig',
-    'products.apps.ProductsConfig'
+    'products.apps.ProductsConfig',
+    'api.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [

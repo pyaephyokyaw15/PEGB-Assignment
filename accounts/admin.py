@@ -24,7 +24,7 @@ class AccountAdmin(UserAdmin):
          ),
     )
 
-    # readonly_fields = ['customer_category']
+    readonly_fields = ['customer_category']
 
 
 # Register models on admin site

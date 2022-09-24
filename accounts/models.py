@@ -34,12 +34,6 @@ class AccountManager(BaseUserManager):
         user = self.model(email=email, first_name=first_name, last_name=last_name, password=password,  **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-        customer_category = CustomerCategory.objects.filter(name='Bronze').first()
-        print(user)
-        print("Category", customer_category)
-        user.customer_category = customer_category
-        user.save()
-        print(user)
         return user
 
     def create_superuser(self, email, first_name, last_name, password, **extra_fields):
