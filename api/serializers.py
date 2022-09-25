@@ -113,6 +113,19 @@ class ProductSerializer(serializers.ModelSerializer):
         obj = super().create(validated_data)
         return obj
 
+    def to_representation(self, instance):  # override the serializer response
+        request = self.context.get('request')
+        user = request.user
+        representation = super().to_representation(instance)
+        representation['has_access'] = False
+
+        # has_access status is to help the client side to know the current user has the access to edit/delete the product.
+        if request.user.is_authenticated:
+            if request.user.is_staff and request.user.department:
+                representation['has_access'] = instance.category == user.department.category
+
+        return representation
+
 
 class CartItemCreateSerializer(serializers.ModelSerializer):
     class Meta:

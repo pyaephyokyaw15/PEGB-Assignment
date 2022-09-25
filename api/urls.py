@@ -18,4 +18,5 @@ urlpatterns = [
     path('auth/token/', views.TokenView.as_view(), name='token'),
     path('auth/register/', views.UserRegisterAPIView.as_view(), name='register'),
     path('accounts/', views.AccountListView.as_view(), name='accounts'),
+    path('staff-products/', views.StaffProductListView.as_view(), name='staff-products')
 ]

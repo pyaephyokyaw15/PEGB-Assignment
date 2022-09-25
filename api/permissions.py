@@ -32,3 +32,16 @@ class DepartmentStaffOnly(permissions.BasePermission):
         # Only the staff who is from the department that has access to maintain the product
         else:
             return obj.category == request.user.department.category
+
+
+class DepartmentStaffOnly2(permissions.BasePermission):
+    def has_permission(self, request, view):
+        """
+        Model-level permission
+        Return `True` if permission is granted, `False` otherwise.
+        """
+
+        if request.user.is_authenticated:
+            if request.user.is_staff and request.user.department:
+                return True
+        return False

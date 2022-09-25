@@ -6,17 +6,22 @@ from .serializers import CustomAuthTokenSerializer, UserRegisterSerializer, Prod
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, viewsets
 from products.models import Product
 from accounts.models import Account, CustomerCategory
 from cart.models import Cart, CartItem
 from orders.models import Order, OrderItem
-from .permissions import DepartmentStaffOnly
+from .permissions import DepartmentStaffOnly, DepartmentStaffOnly2
 from rest_framework import permissions
+from accounts.views import send_account_activation_email
+from .renderers import CustomApiRenderer
+from rest_framework.pagination import PageNumberPagination
+
 # Create your views here.
 class TokenView(ObtainAuthToken):
     # POST api/v1/auth/token/
     serializer_class = CustomAuthTokenSerializer
+    renderer_classes = [CustomApiRenderer]
 
 
     # generate token
@@ -26,7 +31,7 @@ class TokenView(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
-            # "user": UserInfoSerializer(user).data,
+            "user": UserSerializer(user).data,
             "token": token.key
         })
 
@@ -58,12 +63,14 @@ class UserRegisterAPIView(generics.GenericAPIView):
         print(user.password)
 
         # create token and return this token
-        token, created = Token.objects.get_or_create(user=user)
+        created = Token.objects.get_or_create(user=user)
+        send_account_activation_email(user, request)
 
         return Response({
-            # "user": UserInfoSerializer(user).data,
-            "token": token.key
+            "email": "Account Activation Email is sent."
         })
+
+
 
 
 class AccountListView(generics.ListAPIView):
@@ -75,6 +82,17 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     permission_classes = [DepartmentStaffOnly]
+
+
+class StaffProductListView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    permission_classes = [DepartmentStaffOnly2]
+
+    def get_queryset(self):
+        """Filter the default query_set according to the request parameter"""
+        queryset = self.queryset.filter(category=self.request.user.department.category)
+        return queryset
 
 
 class CartViewSet(viewsets.ModelViewSet):
