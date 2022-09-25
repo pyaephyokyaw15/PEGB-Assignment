@@ -6,13 +6,12 @@ from django.utils.encoding import force_bytes, force_str
 from accounts.utils import generate_token
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
-from django.conf import  settings
+from django.conf import settings
 
 
 User = get_user_model()
 
 # Create your views here.
-
 def send_account_activation_email(user, request):
     current_site = get_current_site(request)
     email_subject = "Activate your account"
@@ -24,18 +23,17 @@ def send_account_activation_email(user, request):
     })
 
     email = EmailMessage(subject=email_subject, body=email_body, from_email=settings.EMAIL_FROM_USER,
-                 to=[user.email])
+                to=[user.email])
     email.send()
 
 
 def activate_user(request, uidb64, token):
-
     try:
-        uid=force_str(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except Exception as e:
+        print(e)
         user = None
-
 
     if user and generate_token.check_token(user, token):
         user.is_active = True

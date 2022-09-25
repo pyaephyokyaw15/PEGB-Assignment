@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
-from accounts.models import Account, CustomerCategory
 from drf_extra_fields.fields import Base64ImageField
 from products.models import Product, Category
 from accounts.models import Account, CustomerCategory
 from cart.models import Cart, CartItem
 from orders.models import Order, OrderItem
+
 
 class CustomAuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(
@@ -49,7 +49,6 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Account
         fields = ['email', 'password', 'first_name', 'last_name']
@@ -77,6 +76,7 @@ class CustomerCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerCategory
         fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     department = serializers.SlugRelatedField(read_only=True, slug_field="name")
@@ -132,8 +132,10 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'cart', 'product', 'quantity']
 
+
 class CartItemSerializer(CartItemCreateSerializer):
     product = ProductSerializer(read_only=True)
+
 
 class CartSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -151,13 +153,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'order', 'product', 'quantity', 'sub_total', 'discount_percentage', 'discounted_price']
 
 
-
 class OrderSerializer(serializers.ModelSerializer):
     customer = UserSerializer(read_only=True)
     class Meta:
         model = Order
-        fields = ['id', 'order_number', 'customer', ]
-        read_only_fields = ['id', 'order_number', 'customer', 'order_items']
+        fields = ['id', 'order_number', 'customer', 'order_total']
+        read_only_fields = ['id', 'order_number', 'customer', 'order_total']
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):

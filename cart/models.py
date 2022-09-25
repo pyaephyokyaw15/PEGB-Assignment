@@ -8,6 +8,7 @@ User = get_user_model()
 # Create your models here.
 class Cart(models.Model):
     user = models.OneToOneField(User, related_name="user_cart", on_delete=models.CASCADE, null=True, blank=True)
+
     @property
     def total_price(self):
         return sum([item.sub_total for item in self.cart_items.all()])

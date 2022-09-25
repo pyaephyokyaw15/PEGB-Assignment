@@ -23,7 +23,6 @@ class TokenView(ObtainAuthToken):
     serializer_class = CustomAuthTokenSerializer
     renderer_classes = [CustomApiRenderer]
 
-
     # generate token
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -69,8 +68,6 @@ class UserRegisterAPIView(generics.GenericAPIView):
         return Response({
             "email": "Account Activation Email is sent."
         })
-
-
 
 
 class AccountListView(generics.ListAPIView):
@@ -152,8 +149,10 @@ class OrderViewSet(viewsets.ModelViewSet):
         CartItem.objects.filter(cart=cart).delete()
         no_orders = Order.objects.filter(customer=request.user).count()
 
+        # find the customer_category according to the user's no of orders
         customer_category = CustomerCategory.objects.filter(minimum_order__lte=no_orders).last()
 
+        # update customer category according to the user's no of orders
         request.user.customer_category = customer_category
         request.user.save()
         return Response({"order_id": order.id}, status=status.HTTP_201_CREATED)

@@ -22,13 +22,11 @@ class Order(models.Model):
         return total
 
 
-
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     discount_percentage = models.FloatField(default=0)
-
 
     def __str__(self):
         return self.product.name
@@ -36,7 +34,6 @@ class OrderItem(models.Model):
     @property
     def sub_total(self):
         return int(self.product.price) * int(self.quantity)
-
 
     @property
     def discounted_price(self):

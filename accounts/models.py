@@ -17,6 +17,7 @@ class CustomerCategory(models.Model):
     def __str__(self):
         return self.name
 
+
 class AccountManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -60,8 +61,6 @@ class Account(AbstractUser):
     REQUIRED_FIELDS = ['first_name', 'last_name']
     USERNAME_FIELD = 'email'
     objects = AccountManager()
-
-
 
 
 class Department(models.Model):
