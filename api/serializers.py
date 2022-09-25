@@ -6,7 +6,7 @@ from drf_extra_fields.fields import Base64ImageField
 from products.models import Product, Category
 from accounts.models import Account, CustomerCategory
 from cart.models import Cart, CartItem
-
+from orders.models import Order, OrderItem
 
 class CustomAuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(
@@ -101,7 +101,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price', 'quantity', 'category', 'image']
+        fields = ['id', 'name', 'price', 'stock', 'category', 'image']
         read_only_fields = ['id', 'category']  # show only on GET request
 
     def create(self, validated_data):  # override the create method
@@ -114,11 +114,13 @@ class ProductSerializer(serializers.ModelSerializer):
         return obj
 
 
-class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+class CartItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['cart', 'product', 'quantity']
+        fields = ['id', 'cart', 'product', 'quantity']
+
+class CartItemSerializer(CartItemCreateSerializer):
+    product = ProductSerializer(read_only=True)
 
 class CartSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -129,3 +131,27 @@ class CartSerializer(serializers.ModelSerializer):
         read_only_fields = ['cart_items']  # show only on GET request
 
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'product', 'quantity', 'sub_total', 'discount_percentage', 'discounted_price']
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    customer = UserSerializer(read_only=True)
+    class Meta:
+        model = Order
+        fields = ['id', 'order_number', 'customer', ]
+        read_only_fields = ['id', 'order_number', 'customer', 'order_items']
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    customer = UserSerializer(read_only=True)
+    order_items = OrderItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', 'order_number', 'customer', 'order_items', 'order_total']
+        read_only_fields = ['id', 'order_number', 'customer', 'order_items']

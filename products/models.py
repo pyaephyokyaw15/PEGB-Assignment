@@ -20,7 +20,7 @@ class Product(models.Model):
     price = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="products/", null=True, blank=True)
-    quantity = models.IntegerField()
+    stock = models.IntegerField()
 
     class Meta:
         ordering = ['-id']

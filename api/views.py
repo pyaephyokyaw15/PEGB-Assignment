@@ -1,15 +1,18 @@
 from rest_framework.authtoken.views import ObtainAuthToken
 from .serializers import CustomAuthTokenSerializer, UserRegisterSerializer, ProductSerializer, \
-    UserSerializer, CartSerializer, CartItemSerializer
+    UserSerializer, CartSerializer, CartItemSerializer, CartItemCreateSerializer, \
+    OrderSerializer, OrderDetailSerializer, \
+    OrderItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics, permissions, viewsets
 from products.models import Product
-from accounts.models import Account
+from accounts.models import Account, CustomerCategory
 from cart.models import Cart, CartItem
+from orders.models import Order, OrderItem
 from .permissions import DepartmentStaffOnly
-
+from rest_framework import permissions
 # Create your views here.
 class TokenView(ObtainAuthToken):
     # POST api/v1/auth/token/
@@ -90,3 +93,55 @@ class CartViewSet(viewsets.ModelViewSet):
 class CartItemViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
+
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+        if self.action in ['create', 'update']:
+            return CartItemCreateSerializer
+        return self.serializer_class
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
+
+    def get_queryset(self):
+        """Filter the default query_set according to the request parameter"""
+        queryset = self.queryset.filter(customer=self.request.user)
+        return queryset
+
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+        if self.action == 'retrieve':
+            return OrderDetailSerializer
+        return self.serializer_class
+
+    def create(self, request, *args, **kwargs):
+        order = Order.objects.create(customer=self.request.user)
+        order.save()
+        order.order_number = f'S-{order.id:06d}'
+        order.save()
+
+        cart = self.request.user.user_cart
+        for item in cart.cart_items.all():
+            item.product.stock -= 1
+            item.product.save()
+            order_item = OrderItem.objects.create(order=order, product=item.product, quantity=item.quantity)
+            order_item.discount_percentage = self.request.user.customer_category.discount_percentage + item.product.category.discount_percentage
+            order_item.save()
+
+        CartItem.objects.filter(cart=cart).delete()
+        no_orders = Order.objects.filter(customer=request.user).count()
+
+        customer_category = CustomerCategory.objects.filter(minimum_order__lte=no_orders).last()
+
+        request.user.customer_category = customer_category
+        request.user.save()
+        return Response({"order_id": order.id}, status=status.HTTP_201_CREATED)
+
+
+class OrderItemViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OrderItemSerializer
+    queryset = OrderItem.objects.all()

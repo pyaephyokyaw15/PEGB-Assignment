@@ -9,11 +9,10 @@ class CustomerCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     discount_percentage = models.FloatField(default=0)
     minimum_order = models.IntegerField()
-    maximum_order = models.IntegerField()
-
 
     class Meta:
         verbose_name_plural = 'customer categories'
+        ordering = ['minimum_order']
 
     def __str__(self):
         return self.name
