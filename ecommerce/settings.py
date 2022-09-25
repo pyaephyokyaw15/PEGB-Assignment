@@ -49,6 +49,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # Register your apps here
+    'accounts.apps.AccountsConfig',
+    'products.apps.ProductsConfig',
+    'api.apps.ApiConfig',
+    'cart.apps.CartConfig',
+    'orders.apps.OrdersConfig'
 ]
 
 MIDDLEWARE = [
@@ -92,10 +97,11 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'accounts.Account'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -118,10 +124,11 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication"
     ],
     'DEFAULT_PAGINATION_CLASS': "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 20,
     'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        # 'rest_framework.renderers.JSONRenderer',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
+        'api.renderers.CustomApiRenderer'
     ]
 }
 
@@ -143,7 +150,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Media files
+MEDIA_ROOT = BASE_DIR /'media'
+MEDIA_URL = '/media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# EMIAL CONFIG
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
+EMAIL_FROM_USER = os.getenv("EMAIL_FROM_USER")
