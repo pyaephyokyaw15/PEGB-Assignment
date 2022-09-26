@@ -1,3 +1,7 @@
+# Ecommerce API
+
+REST API for Ecommerce website according to the requirements in the assignment.
+
 ## Quick Start
 
 To get this project up and running locally on your computer:
@@ -28,8 +32,12 @@ To get this project up and running locally on your computer:
 * Create Staff Users, Department, Prdouct Categeory and Customer Category.
 
 
-* Test the API with the POSTMAN Collection.
-
-
-* Export this url in POSTMAN Desktop App.
+* Import this url in POSTMAN Desktop App and Test API.
 https://www.getpostman.com/collections/f605154cffe574c41732
+
+
+## Containerization(Docker)
+```
+sudo docker build --tag python-django .
+sudo docker run --publish 8000:8000 python-django
+```
